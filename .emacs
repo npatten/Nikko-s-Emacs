@@ -1,24 +1,90 @@
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector ["#2e3436" "#a40000" "#4e9a06" "#c4a000" "#204a87" "#5c3566" "#729fcf" "#eeeeec"])
- '(custom-enabled-themes (quote (wheatgrass))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
 
-;;; all the package managers!!
+
+;;; Disable unused UI elements.
+;;;  in a way that doesn't load them just for them to disabled.
+(if (fboundp 'tool-bar-mode)
+    (tool-bar-mode -1))
+(menu-bar-mode 1)
+(setq-default inhibit-startup-screen t)
+ 
+(global-auto-revert-mode 1)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;; Package Management Stuff ;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 
+;;; Import packages and add additional package repositories
 (require 'package)
 (add-to-list 'package-archives
-             '("marmalade" . "http://marmalade-repo.org/packages/"))
-(add-to-list 'package-archives
-            '("melpa" . "http://melpa.milkbox.net/packages/") t)
+  '("marmalade" . "http://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives 
+  '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (package-initialize)
+
+
+;;all the toys
+(defvar nikko/packages '(ac-nrepl
+                         ace-jump-mode
+                         ace-jump-mode
+                         auto-complete
+                         cider
+                         clojure-mode
+                         clojure-snippets
+                         clojure-test-mode
+                         closure-lint-mode
+                         dash
+                         epl
+                         expand-region
+                         flex-autopair
+                         flycheck
+                         git-commit-mode
+                         helm
+                         helm-projectile
+                         helm-themes
+                         magit
+                         multiple-cursors
+                         paredit
+                         pkg-info
+                         popup
+                         projectile
+                         rainbow-delimiters
+                         ace-jump-mode))
+
+;;load em all up
+(mapc (lambda (package) (when (not (package-installed-p package)) (package-install package)))
+      nikko/packages)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;; Make emacs fun to work with ;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; raaaaainbows
+(global-rainbow-delimiters-mode t)
+
+;; like I'm going to type out 'yes', pfffft.
+(fset 'yes-or-no-p 'y-or-n-p)
+
+;;; Multiple cursors
+(require 'multiple-cursors)
+(multiple-cursors-mode 1)
+(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+
+(require 'ace-jump-mode)
+(global-set-key (kbd "C-0") 'ace-jump-mode)
+
+
+;;helm-config
+(require 'helm)
+(require 'helm-config)
+(helm-mode 1)
+(global-set-key [(meta x)] 'helm-M-x)
+(global-set-key [(ctrl x) (ctrl f)] 'helm-find-files)
+(global-set-key [(ctrl x) (b)] 'helm-buffers-list)
 
 ;; fix the PATH variable
 (defun set-exec-path-from-shell-PATH ()
@@ -28,24 +94,29 @@
 
 (when window-system (set-exec-path-from-shell-PATH))
 
-
-;; swap around mod keys for mac
-(setq mac-command-modifier 'control)
-(setq mac-command-key-is-meta t)
-(setq mac-control-modifier 'meta)
-
-
-;;; Disable unused UI elements.
-;;;  in a way that doesn't load them just for them to disabled.
-(if (fboundp 'tool-bar-mode)
-    (tool-bar-mode -1))
-(menu-bar-mode -1)
-(setq-default inhibit-startup-screen t)
-
 ;;ido all the things
 (require 'ido)
 (setq ido-enable-flex-matching t)
 (ido-mode t)
+
+;;; projectile mode!
+(projectile-global-mode)
+;; (setq projectile-indexing-method 'native)
+;;(setq projectile-enable-caching t)
+
+(require 'flx-ido)
+(ido-mode 1)
+(ido-everywhere 1)
+(flx-ido-mode 1)
+
+;; disable ido faces to see flx highlights.
+(setq ido-use-faces nil)
+
+;;;; Set up YASnippet
+(require 'yasnippet)
+(yas-global-mode t)
+(setq yas/root-directory "~/.emacs.d/snippets")
+(yas/load-directory yas/root-directory)
 
 ;; share OS clipboard
 (desktop-save-mode 1)
@@ -84,104 +155,21 @@
 ;;Font
 (set-frame-font "Menlo Regular 14")
 
-;;;; Clojure!
-(unless (package-installed-p 'clojure-mode)
-  (package-refresh-contents)
-  (package-install 'clojure-mode))
-(add-to-list 'auto-mode-alist '("\\.clj$" . clojure-mode))
+;;; magit for git awesomeness
+(autoload 'magit-status "magit" nil t)
+(global-set-key [f7] 'magit-status)
 
-;;cider
-(unless (package-installed-p 'cider)
-  (package-install 'cider))
-(require 'cider)
+;;;; Enable Expand Region
+(require 'expand-region)
+(global-set-key (kbd "C-=") 'er/expand-region)
 
-;;Paredit
-(require 'paredit)
-(dolist (hook '(scheme-mode-hook
-                emacs-lisp-mode-hook
-                lisp-mode-hook
-                clojure-mode-hook))
-  (add-hook hook 'enable-paredit-mode))
+;;;; Enable Undo-Tree for better undo handling
+(require 'undo-tree)
+(global-undo-tree-mode 1)
 
-;; Remove trailing whitespace before saves
-;; (dolist (hook programmig-modes)
-  ;; (add-hook 'before-save-hook 'delete-trailing-whitespace))
-
-(defun NikkoNav-indent-for-tab-command ()
-  "This is to fix `indent-for-tab-command' for `NikkoNav'.
-It runs [tab] or C-i with `gvol-mode' nil because `NikkoNav'
-binds C-i to a different command.  Ideally this should take into
-account window system so that it can DTRT in a terminal (whatever
-the right thing is)."
-  (interactive)
-  (let* ((NikkoNav nil)
-         (command (or (key-binding [tab])
-                      (key-binding "\C-i"))))
-    ;; This is to satisfy `python-indent-line' which checks
-    ;; `this-command' to cycle
-    (setq this-command 'indent-for-tab-command)
-    ;; Make people think this was called with C-i.  This allows
-    ;; `self-insert-command' to work
-    (setq last-command-event 9)
-    (call-interactively command)))
-
-;;; let undo
-(global-unset-key (kbd "C-z"))
-(global-set-key (kbd "C-z") 'undo)
-
-
-
-;;; Custom Minor Mode for nav
-(define-minor-mode NikkoNav
-  "Nikko's custom navigation which uses the i j k l keys in conjunction with control and
-   meta modifiers to have a more gamer friendly navigation system."
-  t
-  ;; The indicator for the mode line.
-  " NikkoNav"
-  ;; The minor mode keymap
-  `(
-    (,(kbd "C-i") .  previous-line)
-    (,(kbd "C-k") .  next-line)
-    (,(kbd "C-j") .  backward-char)
-    (,(kbd "C-l") .  forward-char)
-    (,(kbd "M-i") .  backward-page)
-    (,(kbd "M-k") .  forward-page)
-    (,(kbd "M-j") .  backward-word)
-    (,(kbd "M-l") .  forward-word)
-    (,(kbd "<tab>") .  NikkoNav-indent-for-tab-command)
-    (,(kbd "C-;") . comment-region)
-    (,(kbd "C-:") . uncomment-region)
-    (,(kbd "C-f") . isearch-forward)
-    (,(kbd "C-s") . save-buffer)
-    (,(kbd "C-p") . projectile-find-files)
-    (,(kbd "C-S-k") . kill-line)
-))
-
-(NikkoNav 1)
-
-;;; This prevents NikkoNav from breaking auto complete in the minibuffer
-(defun my-minibuffer-setup-hook ()
-  (NikkoNav 0))
-
-(add-hook 'minibuffer-setup-hook 'my-minibuffer-setup-hook)
-
-(require 'multiple-cursors)
-
-(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-
-;;; projectile mode!
-(projectile-global-mode)
-(setq projectile-indexing-method 'native)
-
-(require 'flx-ido)
-(ido-mode 1)
-(ido-everywhere 1)
-(flx-ido-mode 1)
-;; disable ido faces to see flx highlights.
-(setq ido-use-faces nil)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;; Notes ;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;;; deft for notes
 (require 'deft)
@@ -194,16 +182,93 @@ the right thing is)."
 
 (global-set-key [f8] 'deft)
 
-;; IRC!
+
+;; flyspell mode for spell checking everywhere
+(add-hook 'org-mode-hook 'turn-on-flyspell 'append)
+
+
+;;; Visual line mode for org + text buffers
+(add-hook 'text-mode-hook 'turn-on-visual-line-mode)
+(add-hook 'org-mode-hook 'turn-on-visual-line-mode)
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;; Language-specifics  ;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;Paredit
+(require 'paredit)
+
+(defun maybe-map-paredit-newline ()
+  (unless (or (memq major-mode '(inferior-emacs-lisp-mode cider-repl-mode))
+              (minibufferp))
+    (local-set-key (kbd "RET") 'paredit-newline)))
+
+(add-hook 'paredit-mode-hook 'maybe-map-paredit-newline)
+(add-hook 'clojure-mode-hook 'enable-paredit-mode)
+(autoload 'enable-paredit-mode "paredit" "Turn on pseudo-structural editing of Lisp code." t)
+(add-hook 'emacs-lisp-mode-hook       #'enable-paredit-mode)
+(add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+(add-hook 'ielm-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-mode-hook             #'enable-paredit-mode)
+(add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+(add-hook 'scheme-mode-hook           #'enable-paredit-mode)
+
+(require 'eldoc)
+(eldoc-add-command
+ 'paredit-backward-delete
+ 'paredit-close-round)
+
+
+
+;; quick key change for paredit
+(eval-after-load "paredit"
+  '(progn
+    (define-key paredit-mode-map (kbd "M-e") 'paredit-forward)
+    (define-key paredit-mode-map (kbd "M-a") 'paredit-backward)))
+
+;;; Clojure
+(require 'cider)
+(add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
+(require 'ac-nrepl)
+(ac-nrepl-setup)
+(add-hook 'cider-repl-mode-hook 'ac-nrepl-setup)
+(add-hook 'cider-interaction-mode-hook 'ac-nrepl-setup)
+(eval-after-load "auto-complete"
+  '(add-to-list 'ac-modes 'cider-repl-mode))
+(defun set-auto-complete-as-completion-at-point-function ()
+  (setq completion-at-point-functions '(auto-complete)))  
+(add-hook 'auto-complete-mode-hook 'set-auto-complete-as-completion-at-point-function)
+(add-hook 'cider-repl-mode-hook 'set-auto-complete-as-completion-at-point-function)
+(add-hook 'clojure-mode-hook 'set-auto-complete-as-completion-at-point-function)
+(add-hook 'cider-interaction-mode-hook 'set-auto-complete-as-completion-at-point-function)
+ 
+
+ 
+;; (add-hook 'clojure-mode-hook 
+;; 	  (lambda ()
+;; 	    (local-set-key (kbd "C-c C-e") 'cider-pprint-eval-last-sexp)))
+
+
+
+;;; Lisp
+
+(add-to-list 'lisp-mode-hook 'enable-paredit-mode)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;; IRC ;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (add-to-list 'load-path "~/elisp/erc")
 (require 'erc)
 
 (require 'erc-join)
-(erc-autojoin-mode 1)
+(erc-autojoin-mode 0)
 (setq erc-autojoin-channels-alist
           '(("freenode.net" "#emacs" "#clojure" "#angularjs" "#freestream"
-             "#git" )
-            ("crystalia.net" "#crystalia")))
+             "#git" )))
+
+;;(erc :server  "chat.freenode.net" :port 6667 :nick "npatten")
 
 (erc-timestamp-mode t)
 (setq erc-timestamp-format "[%R-%m/%d]")
@@ -234,3 +299,122 @@ the right thing is)."
                                              'coding-system-for-write)
                                             'emacs-mule))))
 ;; end logging
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;; Nikko's Crazy Keys  ;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; swap around mod keys for mac
+(setq mac-command-modifier 'control)
+(setq mac-command-key-is-meta t)
+(setq mac-control-modifier 'meta)
+
+
+;;; C-z undo
+(global-unset-key (kbd "C-z"))
+;;; Make undo's better
+(global-set-key (kbd "C-z") 'undo)
+
+(global-unset-key (kbd "C-/"))
+(global-set-key (kbd "C-?") 'uncomment-region)
+
+;; going to use C-s as save, and C-f as search
+(global-unset-key (kbd "C-f"))
+(global-unset-key (kbd "C-s"))
+(global-unset-key (kbd "C-k"))
+(global-unset-key (kbd "C-j"))
+
+(define-key isearch-mode-map (kbd "C-f") 'isearch-repeat-forward)
+
+;;helm
+(global-set-key (kbd "C-c h") 'helm-projectile)
+
+
+(defun NikkoNav-indent-for-tab-command ()
+  "This is to fix `indent-for-tab-command' for `NikkoNav'.
+It runs [tab] or C-i with `gvol-mode' nil because `NikkoNav'
+binds C-i to a different command.  Ideally this should take into
+account window system so that it can DTRT in a terminal (whatever
+the right thing is)."
+  (interactive)
+  (let* ((NikkoNav nil)
+         (command (or (key-binding [tab])
+                      (key-binding "\C-i"))))
+    ;; This is to satisfy `python-indent-line' which checks
+    ;; `this-command' to cycle
+    (setq this-command 'indent-for-tab-command)
+    ;; Make people think this was called with C-i.  This allows
+    ;; `self-insert-command' to work
+    (setq last-command-event 9)
+    (call-interactively command)))
+
+;;; Custom Minor Mode for nav
+(define-minor-mode NikkoNav
+  "Nikko's custom navigation which uses the i j k l keys in conjunction with control and
+   meta modifiers to have a more gamer friendly navigation system."
+  t
+  ;; The indicator for the mode line.
+  " NikkoNav"
+  ;; The minor mode keymap
+  `(
+    (,(kbd "C-i") .  previous-line)
+    (,(kbd "C-k") .  next-line)
+    (,(kbd "C-j") .  backward-char)
+    (,(kbd "C-l") .  forward-char)
+    (,(kbd "M-i") .  backward-page)
+    (,(kbd "M-k") .  forward-page)
+    (,(kbd "M-j") .  backward-word)
+    (,(kbd "M-l") .  forward-word)
+    (,(kbd "<tab>") .  NikkoNav-indent-for-tab-command)
+    (,(kbd "C-f") . isearch-forward)
+    (,(kbd "C-s") . save-buffer)
+    (,(kbd "C-p") . projectile-find-files)
+    (,(kbd "C-S-k") . kill-line)
+    (,(kbd "C-/") . comment-region)
+))
+
+(NikkoNav 1)
+
+;;; This prevents NikkoNav from breaking auto complete in the minibuffer
+(defun my-minibuffer-setup-hook ()
+  (NikkoNav 0))
+
+(add-hook 'minibuffer-setup-hook 'my-minibuffer-setup-hook)
+
+
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ac-auto-start 2)
+ '(ac-trigger-key "TAB")
+ '(column-number-mode t)
+ '(electric-layout-mode t)
+ '(electric-pair-mode t)
+ '(global-auto-complete-mode t)
+ ;;'(global-flycheck-mode t nil (flycheck))
+ '(global-rainbow-delimiters-mode t)
+ '(helm-always-two-windows nil)
+ '(helm-buffer-max-length 60)
+ ;; '(helm-grep-preferred-ext "*")
+ '(helm-split-window-in-side-p t)
+ ;; '(help-at-pt-display-when-idle (quote (flymake-overlay)) nil (help-at-pt))
+ ;; '(help-at-pt-timer-delay 1.5)
+ '(inhibit-startup-screen t)
+ '(projectile-global-mode t)
+ '(semantic-mode t)
+ '(semantic-symref-auto-expand-results t)
+ '(ansi-color-names-vector ["#2e3436" "#a40000" "#4e9a06" "#c4a000" "#204a87" "#5c3566" "#729fcf" "#eeeeec"])
+ '(custom-enabled-themes (quote (wheatgrass))))
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+
