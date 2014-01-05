@@ -1,0 +1,150 @@
+;; -*- mode: emacs-lisp; coding: emacs-mule; -*-
+;; --------------------------------------------------------------------------
+;; Desktop File for Emacs
+;; --------------------------------------------------------------------------
+;; Created Sun Jan  5 00:30:14 2014
+;; Desktop file format version 206
+;; Emacs version 24.3.1
+
+;; Global section:
+(setq desktop-missing-file-warning nil)
+(setq tags-file-name nil)
+(setq tags-table-list nil)
+(setq search-ring '("flyspell" "export" "programmi" "deft" "tags" "trail" "checkbox" "animat" "nXh" "nxhtml" "deft" "installed" "ruby" "evernote" "installed" "flx-ido"))
+(setq regexp-search-ring nil)
+(setq register-alist nil)
+(setq file-name-history '("/Users/npatten/.emacs" "/Users/npatten/MySandbox/testHTML-export.html" "/Users/npatten/MySandbox/SparkMaster/Gruntfile.js" "/Users/npatten/MySandbox/rebecca_xmas/deployScript" "/Users/npatten/MySandbox/SparkMaster/app/scripts/controllers/main.js" "/Users/npatten/MySandbox/SparkMaster/deployLog.txt" "/Users/npatten/MySandbox/practice/testScript.sh" "/Users/npatten/Google Drive/20111215080242364.pdf.gdoc" "/Users/npatten/MySandbox/practice/CSS-missing-Manual/styles.css" "/Users/npatten/MySandbox/practice/CSS-missing-Manual/demo.html" "/Users/npatten/Google Drive/20111215080242364.pdf.gdoc" "/Users/npatten/.emacs.d/elpa/evernote-mode-0.41/evernote-mode.el" "/Users/npatten/.emacs" "/Users/npatten/MySandbox/Clj_Play/shouter/shouter/project.clj" "/Users/npatten/MySandbox/pedestal-app-tutorial/tutorial-client/README.md" "/Users/npatten/MySandbox/Clj_Play/clojure-noob.clj" "/Users/npatten/MySandbox/EmacsHacking/nikkoNavMinorMode.lisp" "/Users/npatten/MySandbox/Clj_Play/4ClojureScratch.clj" "/Users/npatten/.emacs" "/Users/npatten/MySandbox/SparkMaster/npm-debug.log" "/Users/npatten/MySandbox/Clj_Play/4ClojureScratch.clj" "/Users/npatten/environment.plist" "/Users/npatten/.emacs"))
+
+;; Buffer section -- buffers listed in same order as in buffer list:
+(desktop-create-buffer 206
+  "/Users/npatten/Google Drive/emacs-notes/marketing-software-evalutation.org"
+  "marketing-software-evalutation.org"
+  'org-mode
+  '(linum-mode NikkoNav projectile-mode flx-ido-mode)
+  1146
+  '(1146 nil)
+  nil
+  nil
+  '((indent-tabs-mode) (buffer-file-coding-system . utf-8-unix) (truncate-lines . t)))
+
+(desktop-create-buffer 206
+  "/Users/npatten/MySandbox/SparkMaster/Gruntfile.js"
+  "Gruntfile.js"
+  'js-mode
+  '(linum-mode NikkoNav projectile-mode flx-ido-mode)
+  9603
+  '(1 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . undecided-unix)))
+
+(desktop-create-buffer 206
+  "/Users/npatten/MySandbox/rebecca_xmas/deployScript"
+  "deployScript"
+  'sh-mode
+  '(linum-mode NikkoNav projectile-mode flx-ido-mode)
+  93
+  '(40 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . undecided-unix)))
+
+(desktop-create-buffer 206
+  "/Users/npatten/MySandbox/SparkMaster/app/scripts/controllers/main.js"
+  "main.js"
+  'js-mode
+  '(linum-mode NikkoNav projectile-mode flx-ido-mode)
+  1
+  '(nil nil)
+  nil
+  nil
+  '((buffer-file-coding-system . undecided-unix)))
+
+(desktop-create-buffer 206
+  "/Users/npatten/Google Drive/emacs-notes/deft-2.org"
+  "deft-2.org"
+  'org-mode
+  '(linum-mode NikkoNav projectile-mode flx-ido-mode)
+  1134
+  '(1134 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix) (truncate-lines . t)))
+
+(desktop-create-buffer 206
+  "/Users/npatten/Google Drive/emacs-notes/deft-0.org"
+  "deft-0.org"
+  'org-mode
+  '(linum-mode NikkoNav projectile-mode flx-ido-mode)
+  25
+  '(nil nil)
+  nil
+  nil
+  '((buffer-file-coding-system . undecided-unix) (truncate-lines . t)))
+
+(desktop-create-buffer 206
+  "/Users/npatten/Google Drive/emacs-notes/deft-1.org"
+  "deft-1.org"
+  'org-mode
+  '(linum-mode NikkoNav projectile-mode flx-ido-mode)
+  23
+  '(1 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . undecided-unix) (truncate-lines . t)))
+
+(desktop-create-buffer 206
+  "/Users/npatten/MySandbox/practice/testScript.sh"
+  "testScript.sh"
+  'sh-mode
+  '(linum-mode NikkoNav projectile-mode flx-ido-mode)
+  193
+  '(192 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix)))
+
+(desktop-create-buffer 206
+  "/Users/npatten/MySandbox/SparkMaster/deployLog.txt"
+  "deployLog.txt"
+  'text-mode
+  '(linum-mode NikkoNav projectile-mode flx-ido-mode)
+  53743
+  '(nil nil)
+  nil
+  nil
+  '((buffer-file-coding-system . undecided-unix)))
+
+(desktop-create-buffer 206
+  "/Users/npatten/Google Drive/emacs-notes/css-notes.org"
+  "css-notes.org"
+  'org-mode
+  '(linum-mode NikkoNav projectile-mode flx-ido-mode)
+  555
+  '(302 nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix) (truncate-lines . t)))
+
+(desktop-create-buffer 206
+  "/Users/npatten/MySandbox/practice/CSS-missing-Manual/styles.css"
+  "styles.css"
+  'css-mode
+  '(linum-mode NikkoNav projectile-mode flx-ido-mode)
+  1
+  '(nil nil)
+  nil
+  nil
+  '((buffer-file-coding-system . undecided-unix)))
+
+(desktop-create-buffer 206
+  "/Users/npatten/Google Drive/emacs-notes/marketing-software-evalutation.html"
+  "marketing-software-evalutation.html"
+  'html-mode
+  '(linum-mode NikkoNav projectile-mode flx-ido-mode)
+  1
+  '(nil nil)
+  nil
+  nil
+  '((buffer-file-coding-system . utf-8-unix)))
+

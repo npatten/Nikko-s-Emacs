@@ -1,0 +1,1 @@
+("~/MySandbox/SparkMaster/" "~/MySandbox/Clj_Play/shouter/shouter/" "~/MySandbox/clj_HelloWorld/helloworld/" "~/MySandbox/SparkMarketing/" "~/MySandbox/pedestal-app-tutorial/tutorial-client/")
