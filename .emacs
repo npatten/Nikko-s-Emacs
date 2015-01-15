@@ -16,26 +16,29 @@
  
 ;;; Import packages and add additional package repositories
 (require 'package)
+;; (add-to-list 'package-archives
+;;   '("marmalade" . "http://marmalade-repo.org/packages/"))
+;; (add-to-list 'package-archives 
+;;   '("melpa" . "http://melpa.milkbox.net/packages/") t)
 (add-to-list 'package-archives
-  '("marmalade" . "http://marmalade-repo.org/packages/"))
-(add-to-list 'package-archives 
-  '("melpa" . "http://melpa.milkbox.net/packages/") t)
+  ;;Zomgz, it's stable
+  '("melpa-stable" . "http://melpa-stable.milkbox.net/packages/") t)
 (package-initialize)
 
 
 ;;all the toys
-(defvar nikko/packages '(ac-nrepl
-                         ace-jump-mode
-                         ace-jump-mode
+(defvar nikko/packages '(ace-jump-mode
                          auto-complete
                          cider
                          clojure-mode
                          clojure-snippets
-                         clojure-test-mode
+                         ;;clojure-test-mode
                          closure-lint-mode
                          dash
+                         deft
                          epl
                          expand-region
+                         flx-ido
                          flex-autopair
                          flycheck
                          git-commit-mode
@@ -49,11 +52,12 @@
                          popup
                          projectile
                          rainbow-delimiters
-                         ace-jump-mode))
+                         undo-tree
+                         ))
 
 ;;load em all up
 (mapc (lambda (package) (when (not (package-installed-p package)) (package-install package)))
-      nikko/packages)
+       nikko/packages)
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -191,6 +195,9 @@
 (add-hook 'text-mode-hook 'turn-on-visual-line-mode)
 (add-hook 'org-mode-hook 'turn-on-visual-line-mode)
 
+;; We want in line syntax for org-babel
+(setq org-src-fontify-natively t)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;; Language-specifics  ;;;;;;;;;;;
@@ -227,13 +234,11 @@
     (define-key paredit-mode-map (kbd "M-e") 'paredit-forward)
     (define-key paredit-mode-map (kbd "M-a") 'paredit-backward)))
 
-;;; Clojure
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;                               Clojure
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (require 'cider)
 (add-hook 'cider-mode-hook 'cider-turn-on-eldoc-mode)
-(require 'ac-nrepl)
-(ac-nrepl-setup)
-(add-hook 'cider-repl-mode-hook 'ac-nrepl-setup)
-(add-hook 'cider-interaction-mode-hook 'ac-nrepl-setup)
 (eval-after-load "auto-complete"
   '(add-to-list 'ac-modes 'cider-repl-mode))
 (defun set-auto-complete-as-completion-at-point-function ()
@@ -243,12 +248,49 @@
 (add-hook 'clojure-mode-hook 'set-auto-complete-as-completion-at-point-function)
 (add-hook 'cider-interaction-mode-hook 'set-auto-complete-as-completion-at-point-function)
  
+(add-hook 'clojure-mode-hook 
+	  (lambda ()
+	    (local-set-key (kbd "C-c C-e") 'cider-pprint-eval-last-sexp)))
 
+;; (defun jim/cider-test-is-test-ns (ns)
+;;   (let ((suffix "-test")) 
+;;     (string-match (rx-to-string `(: ,suffix eos) t) ns)))
  
-;; (add-hook 'clojure-mode-hook 
-;; 	  (lambda ()
-;; 	    (local-set-key (kbd "C-c C-e") 'cider-pprint-eval-last-sexp)))
+;; (defun jim/cider-test-impl-ns-fn (ns)
+;;   (when ns
+;;     (let ((suffix "-test"))
+;;       (if (string-match (rx-to-string `(: ,suffix eos) t) ns)
+;;           (s-replace suffix "" ns)
+;;         ns))))
+ 
+;; (defun jim/cider-test-jump-around ()
+;;   (interactive)
+;;   (let ((ns (cider-current-ns)))
+;;     (switch-to-buffer
+;;      (cider-find-buffer
+;;       (if (jim/cider-test-is-test-ns ns)
+;;           (jim/cider-test-impl-ns-fn ns)
+;;         (cider-test-default-test-ns-fn ns))))))
+ 
+(defun jim/clojure-keybinds ()
+  (interactive)
+  (define-key clojure-mode-map (kbd "C-c C-e") 'cider-pprint-eval-last-sexp)
+  (define-key cider-mode-map (kbd "C-c C-t") 'jim/cider-test-jump-around)
+  (define-key cider-mode-map (kbd "C-c M-,") 'cider-test-run-tests))
+ 
+(add-hook 'clojure-mode-hook 'jim/clojure-keybinds)
 
+;;Stuar Sierra's refresh workflow
+(defun cider-namespace-refresh ()
+  (interactive)
+  (cider-interactive-eval
+   "(require 'clojure.tools.namespace.repl)
+    (clojure.tools.namespace.repl/refresh)"))
+
+(define-key clojure-mode-map (kbd "M-r") 'cider-namespace-refresh)
+
+;;set cider as the backend for org-babel
+(setq org-babel-clojure-backend 'cider)
 
 
 ;;; Lisp
@@ -350,6 +392,7 @@ the right thing is)."
     (call-interactively command)))
 
 ;;; Custom Minor Mode for nav
+;;; TODO: read http://nullprogram.com/blog/2013/02/06/
 (define-minor-mode NikkoNav
   "Nikko's custom navigation which uses the i j k l keys in conjunction with control and
    meta modifiers to have a more gamer friendly navigation system."
@@ -374,6 +417,8 @@ the right thing is)."
     (,(kbd "C-/") . comment-region)
 ))
 
+(define-key cider-mode-map (kbd "C-c C-e") 'cider-pprint-eval-last-sexp)
+
 (NikkoNav 1)
 
 ;;; This prevents NikkoNav from breaking auto complete in the minibuffer
@@ -391,24 +436,21 @@ the right thing is)."
  ;; If there is more than one, they won't work right.
  '(ac-auto-start 2)
  '(ac-trigger-key "TAB")
+ '(ansi-color-names-vector ["#2e3436" "#a40000" "#4e9a06" "#c4a000" "#204a87" "#5c3566" "#729fcf" "#eeeeec"])
  '(column-number-mode t)
+ '(custom-enabled-themes (quote (sanityinc-tomorrow-night)))
+ '(custom-safe-themes (quote ("06f0b439b62164c6f8f84fdda32b62fb50b6d00e8b01c2208e55543a6337433a" default)))
  '(electric-layout-mode t)
  '(electric-pair-mode t)
  '(global-auto-complete-mode t)
- ;;'(global-flycheck-mode t nil (flycheck))
  '(global-rainbow-delimiters-mode t)
  '(helm-always-two-windows nil)
  '(helm-buffer-max-length 60)
- ;; '(helm-grep-preferred-ext "*")
  '(helm-split-window-in-side-p t)
- ;; '(help-at-pt-display-when-idle (quote (flymake-overlay)) nil (help-at-pt))
- ;; '(help-at-pt-timer-delay 1.5)
  '(inhibit-startup-screen t)
  '(projectile-global-mode t)
  '(semantic-mode t)
- '(semantic-symref-auto-expand-results t)
- '(ansi-color-names-vector ["#2e3436" "#a40000" "#4e9a06" "#c4a000" "#204a87" "#5c3566" "#729fcf" "#eeeeec"])
- '(custom-enabled-themes (quote (wheatgrass))))
+ '(semantic-symref-auto-expand-results t))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
